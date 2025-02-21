@@ -22,7 +22,7 @@ A RESTful API built with Express.js and TypeScript for user management with auth
 
 1. Clone the repository:
 ```bash
-git clone (https://github.com/akshat-code21/Wellfound-Assignement-Backend)
+git clone https://github.com/akshat-code21/Wellfound-Assignement-Backend
 ```
 2. Install dependencies:
 ```bash
