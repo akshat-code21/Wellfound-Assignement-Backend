@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/config/index.ts","./src/models/index.ts"],"version":"5.7.3"}
+{"root":["./src/index.ts","./src/@types/index.d.ts","./src/config/index.ts","./src/middlewares/index.ts","./src/middlewares/validate.middleware.ts","./src/models/index.ts","./src/routes/auth.ts","./src/routes/user.ts","./src/validators/user.validation.ts"],"version":"5.7.3"}

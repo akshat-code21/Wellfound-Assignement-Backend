@@ -8,6 +8,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   hashedPassword: { type: String, required: true },
+  role: { type: String, enum: ["admin", "user"], default: "user" },
 });
 const CreateUserSchema = new Schema({
   name: { type: String, required: true },

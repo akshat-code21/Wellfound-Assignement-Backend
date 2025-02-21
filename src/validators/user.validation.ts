@@ -22,6 +22,7 @@ export const userValidation = {
     name: Joi.string().required().min(2).max(50),
     email: Joi.string().email().required(),
     password: Joi.string().required().min(6),
+    role: Joi.string().valid("admin", "user"),
   }),
   login: Joi.object({
     email: Joi.string().email().required(),

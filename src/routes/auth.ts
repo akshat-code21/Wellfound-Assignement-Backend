@@ -13,7 +13,8 @@ authRouter.post(
   validate(userValidation.signup),
   async (req: Request, res: Response) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password,role } = req.body;
+      const assignedRole = role && role === "admin" ? "admin" : "user";
       const existingUser = await UsersModel.findOne({ email });
       if (existingUser) {
         res.status(409).json({
@@ -26,6 +27,7 @@ authRouter.post(
         name: name,
         email: email,
         hashedPassword: hashedPassword,
+        role: assignedRole,
       });
       res.status(201).json({
         message: "user created sucessfully",

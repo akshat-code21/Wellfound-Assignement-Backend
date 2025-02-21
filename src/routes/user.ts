@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import authMiddleware from "../middlewares";
+import authMiddleware, { adminMiddleware } from "../middlewares";
 import { validate } from "../middlewares/validate.middleware";
 import { userValidation } from "../validators/user.validation";
 import { CreateUsersModel } from "../models";
@@ -58,28 +58,29 @@ userRouter.get("/:id", validate(userValidation.idParam), async (req, res) => {
 });
 userRouter.put(
   "/:id",
-  validate(userValidation.idParam),
-  validate(userValidation.updateUser),
+  validate(userValidation.idParam, 'params'),
+  validate(userValidation.updateUser, 'body'),
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const { name, email, role } = req.body;
-      const user = await CreateUsersModel.updateOne(
-        {
-          _id: id,
-        },
+      const user = await CreateUsersModel.findByIdAndUpdate(
+        id,
         {
           name,
           email,
           role,
-        }
+        },
+        { new: true }
       );
+      
       if (!user) {
         res.status(404).json({
           message: "User not found",
         });
         return;
       }
+      
       res.json({ message: "User updated successfully", user });
     } catch (error) {
       res.status(500).json({
@@ -90,23 +91,34 @@ userRouter.put(
 );
 userRouter.delete(
   "/:id",
-  validate(userValidation.idParam),
+  validate(userValidation.idParam, 'params'),
+  adminMiddleware,
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const user = await CreateUsersModel.findOne({
-      _id: id,
-    });
-    if (!user) {
+    try {
+      const { id } = req.params;
+      const user = await CreateUsersModel.findOne({
+        _id: id,
+      });
+      
+      if (!user) {
+        res.status(404).json({
+          message: "User doesn't exist"
+        });
+        return;
+      }
+      
+      await CreateUsersModel.deleteOne({
+        _id: id,
+      });
+      
       res.json({
-        message: "User doesn't exist",
+        message: "user deleted"
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error"
       });
     }
-    await CreateUsersModel.deleteOne({
-      _id: id,
-    });
-    res.json({
-      message: "user deleted",
-    });
   }
 );
 export default userRouter;

@@ -1,18 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
 
-export const validate = (schema: Joi.ObjectSchema) => {
+export const validate = (schema: Joi.ObjectSchema, type: 'body' | 'params' | 'query' = 'body') => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const validationObject = {};
-
-    if (Object.keys(req.body).length) {
-      Object.assign(validationObject, req.body);
-    }
-    if (Object.keys(req.params).length) {
-      Object.assign(validationObject, req.params);
-    }
-    if (Object.keys(req.query).length) {
-      Object.assign(validationObject, req.query);
+    let validationObject;
+    
+    switch(type) {
+      case 'body':
+        validationObject = req.body;
+        break;
+      case 'params':
+        validationObject = req.params;
+        break;
+      case 'query':
+        validationObject = req.query;
+        break;
     }
 
     const { error } = schema.validate(validationObject, { abortEarly: false });
