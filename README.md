@@ -112,9 +112,10 @@ The API returns appropriate HTTP status codes and error messages:
 src/
 ├── @types/ # TypeScript type definitions
 ├── config/ # Configuration files
+├── controllers/ # Request handlers
 ├── middlewares/ # Express middlewares
 ├── models/ # Mongoose models
-├── routes/ # API routes
+├── routes/ # API route definitions
 ├── validators/ # Joi validation schemas
 └── index.ts # Application entry point
 ```
