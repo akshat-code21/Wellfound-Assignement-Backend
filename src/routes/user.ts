@@ -1,124 +1,26 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import authMiddleware, { adminMiddleware } from "../middlewares";
 import { validate } from "../middlewares/validate.middleware";
 import { userValidation } from "../validators/user.validation";
-import { CreateUsersModel } from "../models";
+import { UserController } from "../controllers/user.controller";
+
 const userRouter: Router = Router();
+
 userRouter.use(authMiddleware);
-userRouter.post(
-  "/",
-  validate(userValidation.createUser),
-  async (req: Request, res: Response) => {
-    try {
-      const { name, email, role } = req.body;
-      await CreateUsersModel.create({ name, email, role });
-      res.status(201).json({
-        message: "User created successfully",
-      });
-    } catch (error: any) {
-      if (error.code === 11000) {
-        res.status(409).json({
-          message: "Email already exists",
-        });
-        return;
-      }
-      res.status(500).json({
-        message: "Internal server error",
-      });
-    }
-  }
-);
-userRouter.get("/", async (req: Request, res: Response) => {
-  const data = await CreateUsersModel.find({});
-  res.json({
-    data,
-  });
-});
-userRouter.get("/:id", validate(userValidation.idParam), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await CreateUsersModel.findOne({
-      _id: id,
-    });
-    if (!user) {
-      res.status(404).json({
-        message: "User not found",
-      });
-      return;
-    }
-    res.json({
-      message: "user found",
-      user,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Internal server error",
-    });
-  }
-});
+
+userRouter.get("/", UserController.getAllUsers);
+userRouter.get("/:id", validate(userValidation.idParam, 'params'), UserController.getUserById);
 userRouter.put(
   "/:id",
   validate(userValidation.idParam, 'params'),
-  validate(userValidation.updateUser, 'body'),
-  async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const { name, email, role } = req.body;
-      const user = await CreateUsersModel.findByIdAndUpdate(
-        id,
-        {
-          name,
-          email,
-          role,
-        },
-        { new: true }
-      );
-      
-      if (!user) {
-        res.status(404).json({
-          message: "User not found",
-        });
-        return;
-      }
-      
-      res.json({ message: "User updated successfully", user });
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error",
-      });
-    }
-  }
+  validate(userValidation.updateUser),
+  UserController.updateUser
 );
 userRouter.delete(
   "/:id",
-  validate(userValidation.idParam, 'params'),
   adminMiddleware,
-  async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const user = await CreateUsersModel.findOne({
-        _id: id,
-      });
-      
-      if (!user) {
-        res.status(404).json({
-          message: "User doesn't exist"
-        });
-        return;
-      }
-      
-      await CreateUsersModel.deleteOne({
-        _id: id,
-      });
-      
-      res.json({
-        message: "user deleted"
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: "Internal server error"
-      });
-    }
-  }
+  validate(userValidation.idParam, 'params'),
+  UserController.deleteUser
 );
+
 export default userRouter;
